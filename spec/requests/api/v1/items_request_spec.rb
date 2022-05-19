@@ -20,30 +20,99 @@ RSpec.describe 'Items API' do
     end
   end
 
-  it 'returns one item' do
+  context 'show' do
+    it 'returns one item' do
+      merchant = create(:merchant)
+      id = create(:item, merchant_id: merchant.id).id
+
+      get "/api/v1/items/#{id}"
+
+      item = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to be_successful
+      expect(response.status).to eq(200)
+
+      expect(item[:data]).to have_key(:id)
+      expect(item[:data][:id]).to be_an(String)
+
+      expect(item[:data][:attributes]).to have_key(:name)
+      expect(item[:data][:attributes][:name]).to be_an(String)
+
+      expect(item[:data][:attributes]).to have_key(:description)
+      expect(item[:data][:attributes][:description]).to be_an(String)
+
+      expect(item[:data][:attributes]).to have_key(:unit_price)
+      expect(item[:data][:attributes][:unit_price]).to be_an(Float)
+
+      expect(item[:data][:attributes]).to have_key(:merchant_id)
+      expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+    end
+
+    describe 'sad paths' do
+      it 'returns error if no item' do
+        merchant = create(:merchant)
+        id = create(:item, merchant_id: merchant.id).id
+
+        get "/api/v1/items/#{id + 1}"
+
+        parsed = JSON.parse(response.body, symbolize_names: true)
+        item = parsed[:data]
+
+        expect(item).to eq({ details: 'No item matches this id' })
+      end
+    end
+  end
+
+  it 'create one item' do
+    merchant = create(:merchant)
+    item_params = {
+      name: 'Stout',
+      description: 'dark notes with rich oatmeal flavor',
+      unit_price: 7.5,
+      merchant_id: merchant.id
+    }
+
+    headers = { 'CONTENT_TYPE' => 'application/json' }
+
+    post '/api/v1/items', headers: headers, params: JSON.generate(item: item_params)
+
+    created_item = Item.last
+
+    expect(response).to be_successful
+    expect(response.status).to eq(201)
+
+    expect(created_item.name).to eq(item_params[:name])
+    expect(created_item.description).to eq(item_params[:description])
+    expect(created_item.unit_price).to eq(item_params[:unit_price])
+    expect(created_item.merchant_id).to eq(item_params[:merchant_id])
+  end
+
+  it 'edit an item' do
     merchant = create(:merchant)
     id = create(:item, merchant_id: merchant.id).id
 
-    get "/api/v1/items/#{id}"
+    previous_name = Item.last.name
+    item_params = { name: 'Sour' }
+    headers = { 'CONTENT_TYPE' => 'application/json' }
 
-    item = JSON.parse(response.body, symbolize_names: true)
+    patch "/api/v1/items/#{id}", headers: headers, params: JSON.generate(item: item_params)
+    item = Item.find_by(id: id)
 
     expect(response).to be_successful
-    expect(response.status).to eq(200)
+    expect(item.name).to_not eq(previous_name)
+    expect(item.name).to eq('Sour')
+  end
 
-    expect(item[:data]).to have_key(:id)
-    expect(item[:data][:id]).to be_an(String)
+  it 'delete and item' do
+    merchant = create(:merchant)
+    id = create(:item, merchant_id: merchant.id).id
 
-    expect(item[:data][:attributes]).to have_key(:name)
-    expect(item[:data][:attributes][:name]).to be_an(String)
+    expect(Item.count).to eq(1)
+    delete "/api/v1/items/#{id}"
 
-    expect(item[:data][:attributes]).to have_key(:description)
-    expect(item[:data][:attributes][:description]).to be_an(String)
-
-    expect(item[:data][:attributes]).to have_key(:unit_price)
-    expect(item[:data][:attributes][:unit_price]).to be_an(Float)
-
-    expect(item[:data][:attributes]).to have_key(:merchant_id)
-    expect(item[:data][:attributes][:merchant_id]).to be_an(Integer)
+    expect(response).to be_successful
+    expect(response.status).to eq(204)
+    expect(Item.count).to eq(0)
+    expect { Item.find(id) }.to raise_error(ActiveRecord::RecordNotFound)
   end
 end
