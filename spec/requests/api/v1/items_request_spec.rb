@@ -115,4 +115,19 @@ RSpec.describe 'Items API' do
     expect(Item.count).to eq(0)
     expect { Item.find(id) }.to raise_error(ActiveRecord::RecordNotFound)
   end
+
+  it 'get merchant data from an item id' do
+    merchant_1 = create(:merchant)
+    merchant_2 = create(:merchant)
+    item = create(:item, merchant_id: merchant_1.id)
+
+    get "/api/v1/items/#{item.id}/merchant"
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+
+    expect(merchant[:data][:id].to_i).to eq(merchant_1.id)
+    expect(merchant[:data][:id].to_i).to_not eq(merchant_2.id)
+    expect(merchant[:data][:attributes][:name]).to eq(merchant_1.name)
+    expect(item.merchant_id).to eq(merchant[:data][:id].to_i)
+  end
 end
