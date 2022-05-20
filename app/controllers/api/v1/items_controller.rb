@@ -13,8 +13,7 @@ class Api::V1::ItemsController < ApplicationController
   end
 
   def create
-    item = Item.new(item_params)
-    render json: ItemSerializer.new(Item.create(item_params)), status: :created if item.save
+    render json: ItemSerializer.new(Item.create(item_params)), status: :created
   end
 
   def update
