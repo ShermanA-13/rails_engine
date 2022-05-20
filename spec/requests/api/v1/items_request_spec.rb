@@ -130,4 +130,32 @@ RSpec.describe 'Items API' do
     expect(merchant[:data][:attributes][:name]).to eq(merchant_1.name)
     expect(item.merchant_id).to eq(merchant[:data][:id].to_i)
   end
+
+  it 'find all items based on search criteria' do
+    merchant = Merchant.create!(name: 'Willy Wonka')
+    item_1 = Item.create!(name: 'Nerds', description: "Don't drop them", unit_price: 10.5, merchant_id: merchant.id)
+    item_2 = Item.create!(name: 'Laffy Taffy Rope', description: 'Longer Chewy Yum Yum', unit_price: 5.5,
+                          merchant_id: merchant.id)
+    item_3 = Item.create!(name: 'Jawbreaker', description: 'Becareful of your teeth', unit_price: 6.5,
+                          merchant_id: merchant.id)
+    item_4 = Item.create!(name: 'Laffy Taffy', description: 'Chewy Goodness', unit_price: 4.5, merchant_id: merchant.id)
+
+    get '/api/v1/items/find_all?name=Taffy'
+
+    items = JSON.parse(response.body, symbolize_names: true)
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+    items[:data].each do |item|
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_a(String)
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_a(String)
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to be_a(Integer)
+      expect(item[:attributes][:name]).to_not eq(item_3.name)
+      expect(item[:attributes][:name]).to_not eq(item_1.name)
+    end
+  end
 end
