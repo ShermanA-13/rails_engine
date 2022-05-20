@@ -8,14 +8,14 @@ RSpec.describe 'merchants API' do
     merchants = JSON.parse(response.body, symbolize_names: true)
 
     expect(response).to be_successful
-    expect(merchants.count).to eq(3)
 
-    merchants.each do |merchant|
+    expect(merchants[:data].count).to eq(3)
+    merchants[:data].each do |merchant|
       expect(merchant).to have_key(:id)
-      expect(merchant[:id]).to be_a(Integer)
+      expect(merchant[:id]).to be_a(String)
 
-      expect(merchant).to have_key(:name)
-      expect(merchant[:name]).to be_a(String)
+      expect(merchant[:attributes]).to have_key(:name)
+      expect(merchant[:attributes][:name]).to be_a(String)
     end
   end
 
@@ -53,5 +53,19 @@ RSpec.describe 'merchants API' do
     expect(item).to have_key(:merchant_id)
     expect(item[:merchant_id]).to eq(merchant_1.id)
     expect(item[:merchant_id]).to_not eq(merchant_2.id)
+  end
+
+  it 'find one merchant based on search criteria' do
+    merchant_1 = Merchant.create!(name: 'Magicccc')
+    merchant_2 = Merchant.create!(name: 'Chimmy Chunga')
+
+    get '/api/v1/merchants/find?name=Magic'
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+    response_data = merchant[:data][:attributes][:name]
+
+    expect(response).to be_successful
+    expect(response.status).to eq(200)
+    expect(response_data).to eq(merchant_1.name)
   end
 end
