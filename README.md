@@ -186,7 +186,7 @@ At this point you should be access the endpoints of the api. If you encounter an
 <table>
  <tr>
 
-   <td align="center"><a href="https://github.com/ShermanA-13"><img src="https://avatars.githubusercontent.com/u/95321606?s=400&u=90b2d52424bfbec5411b711901d4789f2e40c470&v=4" width="100px;" alt=""/><br /><sub><b>Sherman (he/him)</b></sub></a><br /><a href="" title="Code">💻</a> <a href="" title="Ideas, Planning, & Feedback">�</a> <a href="" title="Tests">⚠️</a> <a href="" title="Reviewed Pull Requests">👀</a></td>
+   <td align="center"><a href="https://github.com/ShermanA-13"><img src="https://avatars.githubusercontent.com/u/95321606?s=400&u=90b2d52424bfbec5411b711901d4789f2e40c470&v=4" width="100px;" alt=""/><br /><sub><b>Sherman (he/him)</b></sub></a><br /><a href="https://github.com/ShermanA-13/rails_engine/commits?author=ShermanA-13" title="Code">💻</a> <a href="" title="Ideas, Planning, & Feedback">�</a> <a href="https://github.com/ShermanA-13/rails_engine/commits?author=ShermanA-13" title="Tests">⚠️</a> <a href="https://github.com/ShermanA-13/rails_engine/pulls?q=is%3Apr+is%3Aclosed" title="Reviewed Pull Requests">👀</a></td>
 
   </tr>
 
